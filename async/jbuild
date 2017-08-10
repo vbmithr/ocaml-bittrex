@@ -1,0 +1,6 @@
+(library
+ ((name        bittrex_async)
+  (public_name bittrex-async)
+  (modules (bittrex_async))
+  (preprocess (pps (ppx_sexp_conv)))
+  (libraries (bittrex cohttp-async yojson))))

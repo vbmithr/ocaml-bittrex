@@ -1,0 +1,20 @@
+opam-version: "1.2"
+name: "bittrex-async"
+version: "1.0"
+authors: "Vincent Bernardoff <vb@luminar.eu.org>"
+maintainer: "Vincent Bernardoff <vb@luminar.eu.org>"
+homepage: "https://github.com/vbmithr/ocaml-bittrex"
+bug-reports: "https://github.com/vbmithr/ocaml-bittrex/issues"
+dev-repo: "git://github.com/vbmithr/ocaml-bittrex"
+
+available: [
+  ocaml-version >= "4.02.0"
+]
+
+build: [ "jbuilder" "build" "-j" jobs "-p" name "@install" ]
+depends: [
+  "jbuilder" {build & >= "1.0+beta11"}
+  "bittrex" {= "1.0"}
+  "cohttp-async" {>= "0.99.0"}
+  "yojson" {>= "1.4.0"}
+]
