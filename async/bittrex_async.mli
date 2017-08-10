@@ -10,6 +10,8 @@ module RestError : sig
     | Server of string
     | Bittrex of string
     | Data_encoding
+
+  val to_string : t -> string
 end
 
 val markets :
