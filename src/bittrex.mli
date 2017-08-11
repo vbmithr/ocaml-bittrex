@@ -102,6 +102,7 @@ module MarketHistory : sig
     side : Side.t ;
   }
 
+  val compare : t -> t -> int
   val encoding : t Json_encoding.encoding
 end
 

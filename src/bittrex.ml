@@ -232,6 +232,11 @@ module MarketHistory = struct
     side : Side.t ;
   }
 
+  let compare { id } { id = id' } =
+    if id > id' then 1
+    else if id < id' then -1
+    else 0
+
   let encoding =
     let open Json_encoding in
     conv
