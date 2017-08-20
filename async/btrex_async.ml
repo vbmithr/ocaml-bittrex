@@ -1,7 +1,7 @@
 open Core
 open Async
 
-open Bittrex
+open Btrex
 
 open Cohttp_async
 

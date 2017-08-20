@@ -264,5 +264,3 @@ module Order = struct
       (obj1
         (req "uuid" Encoding.uuid))
 end
-
-

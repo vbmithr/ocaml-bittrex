@@ -1,6 +1,6 @@
 (library
- ((name        bittrex)
-  (public_name bittrex)
-  (modules (bittrex))
+ ((name        btrex)
+  (public_name btrex)
+  (modules (btrex))
   (preprocess (pps (ppx_sexp_conv)))
   (libraries (ptime uuidm ocplib-json-typed))))
