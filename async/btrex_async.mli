@@ -65,3 +65,8 @@ val orderhistory :
   ?buf : Bi_outbuf.t -> ?log:Log.t -> ?symbol:string ->
   key:string -> secret:string -> unit ->
   (Cohttp.Response.t * Yojson.Safe.json list, RestError.t) Deferred.Result.t
+
+val balances :
+  ?buf : Bi_outbuf.t -> ?log:Log.t ->
+  key:string -> secret:string -> unit ->
+  (Cohttp.Response.t * Balance.t list, RestError.t) Deferred.Result.t

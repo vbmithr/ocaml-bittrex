@@ -120,7 +120,7 @@ module Balance : sig
     available : float ;
     pending : float ;
     address : string ;
-    requested : bool ;
-    uuid : Uuidm.t option ;
   }
+
+  val encoding : t Json_encoding.encoding
 end

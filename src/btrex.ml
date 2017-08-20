@@ -274,7 +274,19 @@ module Balance = struct
     available : float ;
     pending : float ;
     address : string ;
-    requested : bool ;
-    uuid : Uuidm.t option ;
   }
+
+  let encoding =
+    let open Json_encoding in
+    conv
+      (fun _ -> failwith "Balance.encoding: not implemented")
+      (fun ((), (currency, balance, available, pending, address)) ->
+         { currency ; balance ; available ; pending ; address })
+      (merge_objs unit
+         (obj5
+            (req "Currency" string)
+            (req "Balance" float)
+            (req "Available" float)
+            (req "Pending" float)
+            (req "CryptoAddress" string)))
 end

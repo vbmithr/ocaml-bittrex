@@ -162,3 +162,7 @@ let orderhistory ?buf ?log ?symbol ~key ~secret () =
     | #Yojson.Safe.json ->
       Result.fail (RestError.Bittrex "orderhistory: list expected")
   end
+
+let balances ?buf ?log ~key ~secret () =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/account/getbalances" in
+  call ~auth:(key, secret) ?buf ?log url (Json_encoding.list Balance.encoding)
