@@ -107,8 +107,20 @@ module MarketHistory : sig
   val encoding : t Json_encoding.encoding
 end
 
-module Order : sig
+module OrderID : sig
   type t = Uuidm.t
 
   val encoding : t Json_encoding.encoding
+end
+
+module Balance : sig
+  type t = {
+    currency : string ;
+    balance : float ;
+    available : float ;
+    pending : float ;
+    address : string ;
+    requested : bool ;
+    uuid : Uuidm.t option ;
+  }
 end

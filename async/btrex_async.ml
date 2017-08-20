@@ -37,7 +37,7 @@ module Yojson_encoding = struct
       raise exn
 end
 
-let safe_get ?buf ?log url =
+let safe_get ?(headers=Cohttp.Header.init ()) ?buf ?log url =
   Monitor.try_with ~extract_exn:true begin fun () ->
     Client.get ~ssl_config url >>= fun (resp, body) ->
     let status_code = Cohttp.Code.code_of_status resp.status in
@@ -55,8 +55,21 @@ let safe_get ?buf ?log url =
     | exn -> Cohttp exn
   end
 
-let call ?buf ?log url encoding =
-  safe_get ?buf ?log url >>| function
+let sign ~key ~secret uri =
+  let module SHA512 = Digestif.SHA512.Bytes in
+  let nonce = Time_ns.(now () |> to_int_ns_since_epoch) / 1_000 in
+  let query =
+    ("apikey", [key]) :: ("nonce", [Int.to_string nonce]) :: Uri.query uri in
+  let uri = Uri.with_query uri query in
+  uri,
+  Cohttp.Header.init_with "apisign" (SHA512.hmac ~key:secret (Uri.to_string uri))
+
+let call ?auth ?buf ?log url encoding =
+  let url, headers =
+  match auth with
+  | None -> url, Cohttp.Header.init ()
+  | Some (key, secret) -> sign ~key ~secret url in
+  safe_get ?buf ?log ~headers url >>| function
   | Error err -> Error err
   | Ok (resp, json) -> try
       Ok (resp, (Yojson_encoding.destruct_safe
@@ -96,3 +109,56 @@ let markethistory ?buf ?log symbol =
   let url = Uri.of_string "https://bittrex.com/api/v1.1/public/getmarkethistory" in
   let url = Uri.with_query' url ["market", symbol] in
   call ?buf ?log url (Json_encoding.list MarketHistory.encoding)
+
+let buylimit ?buf ?log ~symbol ~price ~qty ~key ~secret () =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/market/buylimit" in
+  let url = Uri.with_query' url [
+      "market", symbol ;
+      "quantity", Float.to_string qty ;
+      "rate", Float.to_string price ;
+    ] in
+  call ~auth:(key, secret) ?buf ?log url OrderID.encoding
+
+let selllimit ?buf ?log ~symbol ~price ~qty ~key ~secret () =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/market/selllimit" in
+  let url = Uri.with_query' url [
+      "market", symbol ;
+      "quantity", Float.to_string qty ;
+      "rate", Float.to_string price ;
+    ] in
+  call ~auth:(key, secret) ?buf ?log url OrderID.encoding
+
+let cancel ?buf ?log ~key ~secret orderID =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/market/selllimit" in
+  let url = Uri.with_query' url [
+      "uuid", Uuidm.to_string orderID ;
+    ] in
+  call ~auth:(key, secret) ?buf ?log url Json_encoding.null
+
+let openorders ?buf ?log ?symbol ~key ~secret () =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/market/getopenorders" in
+  let url = Uri.with_query' url (List.filter_opt [
+      Option.map symbol ~f:(fun symbol -> "market", symbol) ;
+    ]) in
+  call ~auth:(key, secret) ?buf ?log url Json_encoding.any_value >>|
+  Result.bind ~f:begin fun (resp, json) ->
+    match Json_repr.(any_to_repr (module Yojson) json) with
+    | `List orders ->
+      Result.return (resp, orders)
+    | #Yojson.Safe.json ->
+      Result.fail (RestError.Bittrex "openorders: list expected")
+  end
+
+let orderhistory ?buf ?log ?symbol ~key ~secret () =
+  let url = Uri.of_string "https://bittrex.com/api/v1.1/account/getorderhistory" in
+  let url = Uri.with_query' url (List.filter_opt [
+      Option.map symbol ~f:(fun symbol -> "market", symbol) ;
+    ]) in
+  call ~auth:(key, secret) ?buf ?log url Json_encoding.any_value >>|
+  Result.bind ~f:begin fun (resp, json) ->
+    match Json_repr.(any_to_repr (module Yojson) json) with
+    | `List orders ->
+      Result.return (resp, orders)
+    | #Yojson.Safe.json ->
+      Result.fail (RestError.Bittrex "orderhistory: list expected")
+  end

@@ -3,4 +3,4 @@
   (public_name btrex-async)
   (modules (btrex_async))
   (preprocess (pps (ppx_sexp_conv)))
-  (libraries (btrex cohttp-async yojson))))
+  (libraries (btrex cohttp-async yojson digestif.c))))

@@ -41,3 +41,27 @@ val orderbook :
 val markethistory :
   ?buf : Bi_outbuf.t -> ?log:Log.t -> string ->
   (Cohttp.Response.t * MarketHistory.t list, RestError.t) Deferred.Result.t
+
+val buylimit :
+  ?buf : Bi_outbuf.t -> ?log:Log.t ->
+  symbol:string -> price:float -> qty:float -> key:string -> secret:string -> unit ->
+  (Cohttp.Response.t * Uuidm.t, RestError.t) Deferred.Result.t
+
+val selllimit :
+  ?buf : Bi_outbuf.t -> ?log:Log.t ->
+  symbol:string -> price:float -> qty:float -> key:string -> secret:string -> unit ->
+  (Cohttp.Response.t * Uuidm.t, RestError.t) Deferred.Result.t
+
+val cancel :
+  ?buf : Bi_outbuf.t -> ?log:Log.t -> key:string -> secret:string -> Uuidm.t ->
+  (Cohttp.Response.t * unit, RestError.t) Deferred.Result.t
+
+val openorders :
+  ?buf : Bi_outbuf.t -> ?log:Log.t -> ?symbol:string ->
+  key:string -> secret:string -> unit ->
+  (Cohttp.Response.t * Yojson.Safe.json list, RestError.t) Deferred.Result.t
+
+val orderhistory :
+  ?buf : Bi_outbuf.t -> ?log:Log.t -> ?symbol:string ->
+  key:string -> secret:string -> unit ->
+  (Cohttp.Response.t * Yojson.Safe.json list, RestError.t) Deferred.Result.t

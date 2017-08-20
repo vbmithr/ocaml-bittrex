@@ -255,7 +255,7 @@ module MarketHistory = struct
          (req "OrderType" Side.encoding))
 end
 
-module Order = struct
+module OrderID = struct
   type t = Uuidm.t
 
   let encoding =
@@ -265,4 +265,16 @@ module Order = struct
       (fun u -> u)
       (obj1
         (req "uuid" Encoding.uuid))
+end
+
+module Balance = struct
+  type t = {
+    currency : string ;
+    balance : float ;
+    available : float ;
+    pending : float ;
+    address : string ;
+    requested : bool ;
+    uuid : Uuidm.t option ;
+  }
 end
