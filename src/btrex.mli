@@ -8,6 +8,7 @@ end
 
 module Market : sig
   type t = {
+    symbol : string ;
     quote : string ;
     base : string ;
     quote_descr : string ;

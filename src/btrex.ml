@@ -40,6 +40,7 @@ end
 
 module Market = struct
   type t = {
+    symbol : string ;
     quote : string ;
     base : string ;
     quote_descr : string ;
@@ -53,15 +54,16 @@ module Market = struct
     let open Json_encoding in
     conv
       (fun _ -> failwith "Market.encoding: not implemented")
-      (fun ((), (quote, base, quote_descr, base_descr, ticksize, active, created)) ->
-         { quote ; base ; quote_descr ; base_descr ; ticksize ; active ; created })
+      (fun ((), (quote, base, quote_descr, base_descr, ticksize, symbol, active, created)) ->
+         { quote ; base ; quote_descr ; base_descr ; ticksize ; symbol ; active ; created })
       (merge_objs unit
-         ((obj7
+         ((obj8
              (req "MarketCurrency" string)
              (req "BaseCurrency" string)
              (req "MarketCurrencyLong" string)
              (req "BaseCurrencyLong" string)
              (req "MinTradeSize" float)
+             (req "MarketName" string)
              (req "IsActive" bool)
              (req "Created" Encoding.timestamp))))
 end
